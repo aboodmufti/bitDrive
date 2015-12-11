@@ -1,0 +1,33 @@
+extends layoutSecond
+
+block content
+  h2 New Account
+  - if(msg)
+    div.error #{msg}
+  p Please fill in your information:
+  div
+    form(action="/newAccount", method="post")
+        div
+            table
+                tr
+                  td First Name:
+                  td 
+                    input(type="text", name="Fname")
+                tr
+                  td Last Name:
+                  td 
+                    input(type="text", name="Lname")
+                tr
+                  td Email:
+                  td 
+                    input(type="email", name="email")
+                tr
+                  td Password:
+                  td 
+                    input(type="password", name="password")        
+        br
+        button(type="submit" ,class="green") Create Account
+       
+    form(action="/", method="get")
+        button(type="submit" ,class="gray") Cancel
+        

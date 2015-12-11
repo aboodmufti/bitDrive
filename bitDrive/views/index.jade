@@ -1,0 +1,55 @@
+extends layoutSecond
+
+block content
+  div.
+  div.nav
+    //form(action="/uploadFile", method="post", enctype="multipart/form-data")
+      div.upload
+        span Choose file
+        input(type="file", name="uploaded")
+      br
+      button(type='submit', class='blue') Upload file
+    //div.box
+    form(action="/uploadFile", method="post", enctype="multipart/form-data")
+      input#uploaded(type='file', name='uploaded')
+      label(for='uploaded') 
+        span Choose a file…
+      button(type='submit', class='blue') Upload file
+    form(action="/createDir", method="get")
+      button(type='submit', class='blue') Create Directory
+    form(action="/newAccount", method="get")
+      button(type='submit', class='red') Logout 
+  br 
+  table.currDir
+    tr
+      th #{currDir}
+      //th > Uni > Fall2015 > COMP3203 > Project > Node
+
+  table.mainDir
+    tr
+      th(class='col1') Name
+      th(class='col2') Size
+      th(class='col3') Date Uploaded
+    -for(i = 0; i<dirs.length ; ++i)
+      tr
+        td #{dirs[i].dir_name}
+        td --
+        td #{dirs[i].time}
+    -for(i = 0; i<files.length ; ++i)
+      tr
+        td #{files[i].file_name}
+        td #{files[i].size} Bytes
+        td #{files[i].time}
+    //
+      tr
+        td File
+        td 120KB
+        td August 21, 2014
+      tr
+        td File
+        td 120KB
+        td August 21, 2014
+      tr
+        td File
+        td 120KB
+        td August 21, 2014

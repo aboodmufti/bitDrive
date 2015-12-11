@@ -1,0 +1,252 @@
+body {
+  padding: 50px;
+  font: 18px "Raleway";
+  background-image: url(../images/bitsBackground.png); 
+}
+
+a {
+  color: #00B7FF;
+}
+
+/*FONT*/
+@font-face {
+    font-family: "Raleway";
+    src: url(../other/raleway/Raleway-Light.ttf);
+}
+
+
+/*HEADERS*/
+ 
+
+/*FIELDS*/
+input{
+  width: 200px;
+  height: 30px;
+  margin: 15px;
+  font-size: 20px;
+  padding-left: 5px; 
+  font-family: "Raleway";
+  border:0px solid black;
+  border-bottom: 1px solid #b3b3b3;
+}
+input:focus{
+  outline: 0px ;
+  border-bottom: 1px solid #3399ff;
+}
+
+/*IMAGES*/
+#logoMain{
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: 60px;
+  margin-top: 100px;
+}
+
+#logoSecond{
+  display: block;
+  margin-bottom: 60px;
+  margin-top: 00px;
+  margin-right: auto;
+  margin-left: auto;
+  width:200px; 
+}
+
+/*UPLOAD BUTTON*/
+#uploaded + label {
+  max-width: 80%;
+  font-size: 18px;
+  /* 20px */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  padding: 8px 23px;
+  /*margin-bottom: 20px;
+  border: 0px;
+  height: 75px;
+  
+  cursor: pointer;
+  
+  margin-right:3px;
+  margin-bottom:10px;
+  width: 160px;*/
+  background: #5CADFF;
+  color: White;
+  border-radius: 3px;
+  font-family: "Raleway";
+  margin-right: 5px;
+}
+
+#uploaded {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+#uploaded + label span{
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+
+#uploaded + label:hover {
+    background: #297ACC;
+}
+
+
+/*BUTTONS*/
+
+button{
+  margin-bottom: 20px;
+  font-family: "Raleway";
+  border: 0px;
+  height: 35px;
+  color: White;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-right:3px;
+  margin-bottom:10px;
+  width: 160px;
+  font-size: 18px;
+}
+
+button:focus{
+  outline:0px;
+}
+
+button.blue {
+    background: #5CADFF;
+}
+button.blue:hover{
+  background: #297ACC;
+
+}
+button.blue:active{
+  background: #7DBDFF;
+}
+
+button.red {
+    background: #FF8B8B;
+
+}
+button.red:hover{
+  background: #AC5B5B;
+
+}
+button.red:active{
+  background: #FFADAA;
+}
+
+button.green {
+    background: #9FDF8C;
+}
+button.green:hover{
+  background: #7EB370;
+
+}
+button.green:active{
+  background: #BFF3B0;
+}
+
+
+button.gray {
+    background: #B7B7B7;
+}
+button.gray:hover{
+  background: #787878;
+
+}
+button.gray:active{
+  background: #BDBDBD;
+}
+
+div.nav{
+  display:block;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+/*DIRECTORY*/
+.currDir{
+  border-collapse: collapse;
+  width:100%;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: 20px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.currDir th{
+  border:0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  text-align: left;
+  background-color: #b7dca1;
+  border-radius: 6px;
+}
+
+.mainDir{
+  border-collapse: collapse;
+  width:100%;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: 20px;
+  border-radius: 4px;
+}
+
+.mainDir th{
+  border-bottom: 1px solid #f2f2f2;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  text-align: left;
+  background-color: #b7dca1;
+}
+
+.col1{
+  width:60%;
+  border-right: 1px solid #f2f2f2;
+  border-top-left-radius:6px;
+}
+
+.col2{
+  width:20%;
+  border-right: 1px solid #f2f2f2;
+}
+
+.col3{
+  width:20%;
+  border-top-right-radius:6px;
+}
+
+.mainDir td{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  text-align: left;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f2f2f2;
+  cursor: pointer;
+}
+
+.mainDir td:hover{
+  background-color: #e6e6e6;
+}
+
+/*MISCLEANOUS*/
+.error {
+  color: #BB0000;
+}
+
+
+form{
+  display: inline;
+}
