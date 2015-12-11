@@ -239,18 +239,28 @@ router.post('/uploadFile', upload.single('uploaded') , function(req, res, next) 
 router.post('/createDir', function(req, res, next) {
     var currDirID = req.session.currDirID;
     var userID = req.session.userid
-
-    if (req.session.userid) {
+    res.redirect('/');
+    
+    /*if (req.session.userid) {
       db.serialize(function() {
         db.run('insert into directory values (NULL,?,?,?,?,?)',currDirID,uploaded.originalname,uploaded.filename,currTime(), uploaded.size,checkUpload);
       });
       
     } else {
       res.redirect('/');
-    }
+    }*/
 
 });
 
+//logout
+router.post('/logout', function(req, res) {
+    req.session.destroy(function(err){
+        if (err) {
+            console.log("Error: %s", err);
+        }
+    });
+    res.redirect("/");
+});
 
 function currTime(){
   var today = new Date();
