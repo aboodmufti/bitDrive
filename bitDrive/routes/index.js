@@ -4,6 +4,7 @@ var sqlite3 = require('sqlite3');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var util = require('util');
+//var sync = require('sync');
 
 sqlite3.verbose();
 var db = new sqlite3.Database('mydb.db');
@@ -82,7 +83,7 @@ router.get('/home', function(req, res, next) {
       
       console.log("driectories: " + util.inspect(directories, false, null));
       console.log("files: " + util.inspect(files, false, null));
-      res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : "root >"});
+      res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : "root >", path: ['root', rootID]});
     }
 
     var getDirs = function(err, result){
@@ -132,6 +133,108 @@ router.get('/home', function(req, res, next) {
     }
 
 });
+
+//home/:id
+router.get('/home/:id', function(req, res) {
+    var dirID = req.params.id;
+
+    var directories = [];
+    var files = [];
+    var path = [];
+    var reqDirID;
+    var done = 0;
+
+    var nextParentID;
+
+    function syncSQL(){
+      var callback = function(err, result){
+        
+        if(result){
+          path.unshift(result.dir_name,result.dir_id);
+          nextParentID = result.parent_dir_id;
+          if(result.dir_name == "root"){
+            console.log("FINAL PATH : "+ util.inspect(path, false, null));
+            res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : req.session.currDirName,path:path});
+            return;
+          }
+          retrieve(nextParentID);
+        }else{
+          res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : req.session.currDirName});
+        }
+      }
+
+      var retrieve = function(newID){
+        db.serialize(function() {
+              db.get("select *\
+                       from directory\
+                       where dir_id = ? ", newID, callback);
+        });
+      }
+
+      path.unshift(req.session.currDirName,reqDirID);
+      retrieve(nextParentID);
+      
+    }
+
+    var getFiles = function(err, result){
+      if(result){
+        files = result;
+      }
+      syncSQL();
+    }
+
+    var getDirs = function(err, result){
+      if(result){
+        directories = result;
+      }
+      db.serialize(function() {
+            db.all("select *\
+                     from file\
+                     where dir_id = ? ", reqDirID, getFiles);
+      });
+
+    }
+
+    var getRoot = function(err, result){
+      if(result){
+        if(result.dir_name == 'root'){
+          res.redirect('/home');
+          return;
+        }
+        reqDirID = result.dir_id;
+        req.session.currDirID = reqDirID;
+        req.session.currDirName = result.dir_name;
+        nextParentID = result.parent_dir_id;
+        db.serialize(function() {
+              db.all("select *\
+                       from directory\
+                       where parent_dir_id = ? ", reqDirID, getDirs);
+        });
+      }else{
+        console.log(err);
+        res.redirect('/');
+        //getDirs(undefined,undefined);
+      }
+    }
+
+    if (req.session.userid) {
+      //res.render("index", {title: 'bitDrive'});
+
+      db.serialize(function() {
+            db.get("select *\
+                     from directory\
+                     where user_id = ? and dir_id = ? ", req.session.userid, dirID, getRoot);
+      });
+
+    } else {
+      //res.render('login', { title: 'bitDrive' , msg:"Please login"});
+      var stat = "Please login";
+      req.session.error = stat;
+      res.redirect("/");
+    }
+
+});
+
 
 //newAccount
 router.get('/newAccount', function(req, res, next) {
@@ -239,16 +342,19 @@ router.post('/uploadFile', upload.single('uploaded') , function(req, res, next) 
 router.post('/createDir', function(req, res, next) {
     var currDirID = req.session.currDirID;
     var userID = req.session.userid
-    res.redirect('/');
+    var newDirName = req.body.dirName;
+
+    console.log("create dir: "+util.inspect(req.body, false, null));
+    //res.redirect('/');
     
-    /*if (req.session.userid) {
+    if (req.session.userid) {
       db.serialize(function() {
-        db.run('insert into directory values (NULL,?,?,?,?,?)',currDirID,uploaded.originalname,uploaded.filename,currTime(), uploaded.size,checkUpload);
-      });
-      
+        db.run('insert into directory values (NULL,?,?,?,?)',newDirName,req.session.userid,currDirID,currTime());
+      }); 
+      res.redirect('/home/'+currDirID)
     } else {
       res.redirect('/');
-    }*/
+    }
 
 });
 
@@ -256,7 +362,7 @@ router.post('/createDir', function(req, res, next) {
 router.post('/logout', function(req, res) {
     req.session.destroy(function(err){
         if (err) {
-            console.log("Error: %s", err);
+            console.log("Error logout: %s", err);
         }
     });
     res.redirect("/");
