@@ -8,7 +8,7 @@ var util = require('util');
 
 sqlite3.verbose();
 var db = new sqlite3.Database('mydb.db');
-
+db.run("PRAGMA foreign_keys=ON");
 /* GET home page. */
 router.get('/', function(req, res, next) {
     
@@ -81,8 +81,8 @@ router.get('/home', function(req, res, next) {
         files = result;
       }
       
-      console.log("driectories: " + util.inspect(directories, false, null));
-      console.log("files: " + util.inspect(files, false, null));
+      //console.log("driectories: " + util.inspect(directories, false, null));
+      //console.log("files: " + util.inspect(files, false, null));
       res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : "root >", path: ['root', rootID]});
     }
 
@@ -153,7 +153,7 @@ router.get('/home/:id', function(req, res) {
           path.unshift(result.dir_name,result.dir_id);
           nextParentID = result.parent_dir_id;
           if(result.dir_name == "root"){
-            console.log("FINAL PATH : "+ util.inspect(path, false, null));
+            //console.log("FINAL PATH : "+ util.inspect(path, false, null));
             res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : req.session.currDirName,path:path});
             return;
           }
@@ -313,12 +313,13 @@ router.post('/newAccount', function(req, res, next) {
 router.post('/uploadFile', upload.single('uploaded') , function(req, res, next) {
     var uploaded = req.file;
     var currDirID = req.session.currDirID;
-    //console.log(currDirID);
+    console.log("currDirID: "+currDirID);
+
     var checkUpload =  function(err){
       if(err){
         console.log(err);
       }
-        res.redirect("/");
+        res.redirect("/home/"+currDirID);
     }
 
     if (req.session.userid) {
@@ -329,11 +330,11 @@ router.post('/uploadFile', upload.single('uploaded') , function(req, res, next) 
         });
       }
       else{
-        res.redirect('/');
+        res.redirect("/home/"+currDirID);
       }
 
     } else {
-      res.redirect('/');
+      res.redirect("/home/"+currDirID);
     }
 
 });
@@ -384,6 +385,110 @@ router.post('/download', function(req, res) {
                        from file\
                        where file_id = ? ", fileID, getFile);
       });
+    } else {
+      res.redirect('/');
+    }
+
+});
+
+
+//renameDir
+router.post('/renameDir', function(req, res, next) {
+    var userID = req.session.userid
+    var newDirName = req.body.directoryName;
+    var dirID = req.body.directoryID;
+    var currDirID = req.session.currDirID;
+
+    var checkRename =  function(err,result){
+      if(err){console.log("rename error: " +err);}
+      else{
+        res.redirect('/home/'+currDirID);
+      }
+
+    }
+
+    if (req.session.userid) {
+      db.serialize(function() {
+        db.run('update directory set dir_name = ? where dir_id = ?',newDirName,dirID,checkRename);
+      }); 
+      //res.redirect('/home/'+currDirID)
+    } else {
+      res.redirect('/');
+    }
+
+});
+
+//renameFile
+router.post('/renameFile', function(req, res, next) {
+    var userID = req.session.userid
+    var newfileName = req.body.fileName;
+    var fileID = req.body.fileID;
+    var currDirID = req.session.currDirID;
+
+    var checkRename =  function(err,result){
+      if(err){console.log("rename error: " +err);}
+      else{
+        res.redirect('/home/'+currDirID);
+      }
+
+    }
+
+    if (req.session.userid) {
+      db.serialize(function() {
+        db.run('update file set file_name = ? where file_id = ?',newfileName,fileID,checkRename);
+      }); 
+      //res.redirect('/home/'+currDirID)
+    } else {
+      res.redirect('/');
+    }
+
+});
+
+//deleteDir
+router.post('/deleteDir', function(req, res, next) {
+    var userID = req.session.userid
+    var dirID = req.body.directoryID;
+    var currDirID = req.session.currDirID;
+
+    var checkDelete =  function(err,result){
+      if(err){console.log("delete error: " +err);}
+      else{
+        res.redirect('/home/'+currDirID);
+      }
+
+    }
+
+    if (req.session.userid) {
+      db.serialize(function() {
+        db.run('delete from directory where dir_id = ?',dirID,checkDelete);
+      }); 
+      //res.redirect('/home/'+currDirID)
+    } else {
+      res.redirect('/');
+    }
+
+});
+
+
+//deleteFile
+router.post('/deleteFile', function(req, res, next) {
+    var userID = req.session.userid
+    var fileID = req.body.fileID;
+    var currDirID = req.session.currDirID;
+    //console.log("Delete info: id - "+ fileID)
+    var checkDelete =  function(err,result){
+      if(err){console.log("delete error: " +err);}
+      else{
+        res.redirect('/home/'+currDirID);
+      }
+
+    }
+
+    if (req.session.userid) {
+      db.serialize(function() {
+        db.run('delete from file where file_id = ?',fileID,checkDelete);
+      }); 
+      //res.redirect('/home/'+currDirID)
     } else {
       res.redirect('/');
     }

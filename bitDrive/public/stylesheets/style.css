@@ -249,7 +249,7 @@ div.nav{
 }
 
 /*LIGHTBOX*/
-#lightbox {
+.lightbox {
     position:fixed; /* keeps the lightbox window in the current viewport */
     top:0; 
     left:0; 
@@ -261,7 +261,7 @@ div.nav{
     vertical-align: middle;
 }
 
-#lightbox p {
+.lightbox p {
     text-align:right; 
     color:#fff; 
     margin-right:20px; 
@@ -300,7 +300,7 @@ div.nav{
     padding-right: 5px;
     padding-left: 5px;
     vertical-align: top;
-    width:70%;
+    width:65%;
 }
 
 #content th{
@@ -316,6 +316,31 @@ div.nav{
   width:100%;
 }
 
+/*LINKS*/
+
+.link{
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+a.link:visited{
+    font-weight: bold;
+    color: black;
+   text-decoration-color: black;
+
+}
+
+a.link:hover{
+    color: white ;
+}
+
+a.link:active{
+    color: white ;
+}
+
 /*MISCLEANOUS*/
 .error {
   color: #BB0000;
@@ -324,4 +349,8 @@ div.nav{
 
 form{
   display: inline;
+}
+
+#noFiles{
+  text-align: center;
 }

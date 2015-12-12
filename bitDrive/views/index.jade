@@ -1,6 +1,11 @@
 extends layoutSecond
 block header
   script(src='/javascripts/jquery-1.11.3.min.js')
+  
+
+  link(rel="stylesheet" href="/javascripts/jQuery-contextMenu/dist/jquery.contextMenu.css" type="text/css" media="screen")
+  script(type="text/javascript" src="/javascripts/jQuery-contextMenu/dist/jquery.contextMenu.js")
+  script(type="text/javascript" src="/javascripts/jQuery-contextMenu/dist/jquery.ui.position.js")
   script(src='/javascripts/client.js')
 block content
   div.
@@ -27,7 +32,7 @@ block content
       //th #{currDir}
       - var finalPath ="";
       -for(i = 0; i<path.length ; i += 2)
-        - finalPath += "> <a href='/home/"+path[i+1]+"'>"+ path[i] + "</a> "
+        - finalPath += "> <a href='/home/"+path[i+1]+"' class='link'>"+ path[i] + "</a> "
       th !{finalPath}
       //th > Uni > Fall2015 > COMP3203 > Project > Node
 
@@ -38,7 +43,7 @@ block content
       th(class='col3') Date Uploaded
     -for(i = 0; i<dirs.length ; ++i)
       tr
-        td(name=dirs[i].dir_id , type='dir')
+        td(name=dirs[i].dir_id , type='dir',oldName=dirs[i].dir_name , class='editable')
           img(src='/images/dir.png' class="folderICon") 
           span #{dirs[i].dir_name}
           //#{dirs[i].dir_name}
@@ -46,12 +51,15 @@ block content
         td #{dirs[i].time}
     -for(i = 0; i<files.length ; ++i)
       tr
-        td(name=files[i].file_id , type='file')
+        td(name=files[i].file_id , type='file', oldName=files[i].file_name , class='editable')
           img(src='/images/file.png' class="folderICon") 
           span #{files[i].file_name}
         td #{files[i].size} Bytes
         td #{files[i].time}
-      
+    -if(files.length == 0 && dirs.length == 0)
+      tr
+        td(colspan=3 ,id='noFiles') No files
+
     //
       tr
         td File

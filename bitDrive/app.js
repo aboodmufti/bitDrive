@@ -41,6 +41,8 @@ db.serialize(function() {
             size UNSIGNED BIG INT,\
             foreign key(dir_id) references directory(dir_id) on delete cascade)"
             );
+    
+    db.run("PRAGMA foreign_keys=ON");
 
 });
 
