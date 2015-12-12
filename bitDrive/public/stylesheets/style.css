@@ -354,3 +354,13 @@ form{
 #noFiles{
   text-align: center;
 }
+
+::-moz-selection{
+  background-color:Transparent;
+  color:#000;
+}
+
+::selection {
+  background-color:Transparent;
+  color:#000;
+}
