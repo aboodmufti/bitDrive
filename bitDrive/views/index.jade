@@ -38,7 +38,7 @@ block content
       th(class='col3') Date Uploaded
     -for(i = 0; i<dirs.length ; ++i)
       tr
-        td
+        td(name=dirs[i].dir_id , type='dir')
           img(src='/images/dir.png' class="folderICon") 
           span #{dirs[i].dir_name}
           //#{dirs[i].dir_name}
@@ -46,11 +46,12 @@ block content
         td #{dirs[i].time}
     -for(i = 0; i<files.length ; ++i)
       tr
-        td 
+        td(name=files[i].file_id , type='file')
           img(src='/images/file.png' class="folderICon") 
           span #{files[i].file_name}
         td #{files[i].size} Bytes
         td #{files[i].time}
+      
     //
       tr
         td File

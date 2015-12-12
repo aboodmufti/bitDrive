@@ -359,6 +359,38 @@ router.post('/createDir', function(req, res, next) {
 });
 
 //logout
+router.post('/download', function(req, res) {
+    fileID = req.body.fileID;
+    
+    var getFile =  function(err,result){
+      if(result){
+        console.log(util.inspect(result, false, null))
+        console.log()
+        res.download("uploads/"+result.file_path,result.file_name, function(err){
+              if (err) {
+                console.log('download error: '+err)
+              } else {
+                // decrement a download credit, etc.
+              }
+            }); 
+      }else{
+        res.end();
+      }
+    }
+
+    if (req.session.userid) {
+      db.serialize(function() {
+              db.get("select *\
+                       from file\
+                       where file_id = ? ", fileID, getFile);
+      });
+    } else {
+      res.redirect('/');
+    }
+
+});
+
+//logout
 router.post('/logout', function(req, res) {
     req.session.destroy(function(err){
         if (err) {

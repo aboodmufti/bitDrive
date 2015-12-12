@@ -46,15 +46,37 @@
   });
 
     
-    $( document ).on( "click", "#lightbox", function(e) { //must use on(), as the lightbox element is inserted into the DOM
-        if( e.target == this ) {
-            $('#lightbox').hide();
-            $('html, body').css({
-            'overflow': 'auto',
-            'height': 'auto'
-            });
-        }
+  $( document ).on( "click", "#lightbox", function(e) { //must use on(), as the lightbox element is inserted into the DOM
+      if( e.target == this ) {
+          $('#lightbox').hide();
+          $('html, body').css({
+          'overflow': 'auto',
+          'height': 'auto'
+          });
+      }
+      
+  });
+
+  $( document ).on( "dblclick", "td", function(e) { 
+      console.log("CLICKED : "+ $(this).attr("name")+"  "+$(this).attr("type") );
+      if($(this).attr("type") == 'dir'){
+        window.location.replace("/home/"+$(this).attr("name"));
+      }else{
+        var form = $('<form></form>').attr('action', "/download").attr('method', 'post');
+        form.append($("<input></input>").attr('type', 'hidden').attr('name', "fileID").attr('value', $(this).attr("name")));
+        form.appendTo('body').submit().remove();
         
-    });
+        /*
+        $.post("/download",
+                  {"fileID" : $(this).attr("name")},
+                function(data) {
+
+                      console.log("-----SERVER-----");
+                      console.log(data);
+                      console.log("-----SERVER-----");
+        });*/
+      }
+      
+  });
 
  });
