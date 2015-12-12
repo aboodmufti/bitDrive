@@ -19,7 +19,7 @@ a {
  
 
 /*FIELDS*/
-input{
+input.bigInput{
   width: 200px;
   height: 30px;
   margin: 15px;
@@ -29,7 +29,7 @@ input{
   border:0px solid black;
   border-bottom: 1px solid #b3b3b3;
 }
-input:focus{
+input.bigInput:focus{
   outline: 0px ;
   border-bottom: 1px solid #3399ff;
 }

@@ -6,6 +6,8 @@ block header
   link(rel="stylesheet" href="/javascripts/jQuery-contextMenu/dist/jquery.contextMenu.css" type="text/css" media="screen")
   script(type="text/javascript" src="/javascripts/jQuery-contextMenu/dist/jquery.contextMenu.js")
   script(type="text/javascript" src="/javascripts/jQuery-contextMenu/dist/jquery.ui.position.js")
+  link(rel="stylesheet" href="/javascripts/jQuery_fileUpload/jquery-filestyle.css" type="text/css" )
+  script(src='/javascripts/jQuery_fileUpload/jquery-filestyle.min.js')
   script(src='/javascripts/client.js')
 block content
   div.
@@ -17,11 +19,12 @@ block content
       br
       button(type='submit', class='blue') Upload file
     //div.box
-    form(action="/uploadFile", method="post", enctype="multipart/form-data")
+    //form(action="/uploadFile", method="post", enctype="multipart/form-data")
       input#uploaded(type='file', name='uploaded')
       label(for='uploaded') 
         span Choose a file...
-      button(type='submit', class='blue') Upload file
+      //input.jfilestyle(type='file')
+    button(type='submit', class='blue', id='uploadFile') Upload file
     //form(action="/createDir", method="get")
     button(type='button', class='blue', id="newDir") Create Directory
     form(action="/logout", method="post")
@@ -54,7 +57,7 @@ block content
         td(name=files[i].file_id , type='file', oldName=files[i].file_name , class='editable')
           img(src='/images/file.png' class="folderICon") 
           span #{files[i].file_name}
-        td #{files[i].size} Bytes
+        td #{files[i].size}
         td #{files[i].time}
     -if(files.length == 0 && dirs.length == 0)
       tr

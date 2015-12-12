@@ -83,6 +83,10 @@ router.get('/home', function(req, res, next) {
       
       //console.log("driectories: " + util.inspect(directories, false, null));
       //console.log("files: " + util.inspect(files, false, null));
+      for(i=0; i< files.length; ++i){
+        files[i].size = convertBytes(files[i].size);
+      }
+
       res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : "root >", path: ['root', rootID]});
     }
 
@@ -154,11 +158,17 @@ router.get('/home/:id', function(req, res) {
           nextParentID = result.parent_dir_id;
           if(result.dir_name == "root"){
             //console.log("FINAL PATH : "+ util.inspect(path, false, null));
+            for(i=0; i< files.length; ++i){
+              files[i].size = convertBytes(files[i].size);
+            }
             res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : req.session.currDirName,path:path});
             return;
           }
           retrieve(nextParentID);
         }else{
+          for(i=0; i< files.length; ++i){
+            files[i].size = convertBytes(files[i].size);
+          }
           res.render("index", {title: 'bitDrive', files: files, dirs: directories, currDir : req.session.currDirName});
         }
       }
@@ -524,5 +534,21 @@ function currTime(){
   return today;
 }
 
+function convertBytes(bytes){
+  console.log("bytes in: "+bytes);
+
+  if(bytes < 1000){
+    return bytes +" Bytes";
+  }else if(bytes < 1000000){
+    console.log("bytes out: "+bytes/1000 +" KB");
+    return Math.floor(bytes/1000) +" KB";
+  }else if(bytes < 1000000000){
+    console.log("bytes out: "+bytes/1000000 + " MB");
+    return Math.floor(bytes/1000000) + " MB";
+  }else{
+    console.log("bytes out: "+bytes/1000000000 + " GB");
+    return Math.floor(bytes/1000000000) + " GB";
+  }
+}
 
 module.exports = router;
