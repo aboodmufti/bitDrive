@@ -428,7 +428,7 @@ router.post('/renameDir', function(req, res, next) {
 
     if (req.session.userid) {
       db.serialize(function() {
-        db.run('update directory set dir_name = ? where dir_id = ? and user_id = ',newDirName, dirID, req.session.userid, checkRename);
+        db.run('update directory set dir_name = ? where dir_id = ? and user_id = ?',newDirName, dirID, req.session.userid, checkRename);
       }); 
       //res.redirect('/home/'+currDirID)
     } else {
