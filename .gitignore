@@ -27,11 +27,11 @@ build/Release
 node_modules
 
 # Sessions folder
-bitDrive/sessions
+sessions/
 
 # database
-bitDrive/mydb.db
+mydb.db
 
 # upload folder
-bitDrive/uploads
+uploads/
 
