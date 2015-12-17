@@ -207,7 +207,7 @@ router.get('/home/:id', function(req, res) {
       db.serialize(function() {
             db.all("select *\
                      from file\
-                     where dir_id = ? and user_id", reqDirID,req.session.userid, getFiles);
+                     where dir_id = ? and user_id = ?", reqDirID,req.session.userid, getFiles);
       });
 
     }
