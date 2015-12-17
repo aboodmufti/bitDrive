@@ -540,14 +540,14 @@ function convertBytes(bytes){
   if(bytes < 1000){
     return bytes +" Bytes";
   }else if(bytes < 1000000){
-    console.log("bytes out: "+bytes/1000 +" KB");
-    return Math.floor(bytes/1000) +" KB";
+    //console.log("bytes out: "+bytes/1000 +" KB");
+    return Math.floor((bytes/1000)*10)/10 +" KB";
   }else if(bytes < 1000000000){
-    console.log("bytes out: "+bytes/1000000 + " MB");
-    return Math.floor(bytes/1000000) + " MB";
+    //console.log("bytes out: "+bytes/1000000 + " MB");
+    return Math.floor((bytes/1000000)*10)/10 + " MB";
   }else{
-    console.log("bytes out: "+bytes/1000000000 + " GB");
-    return Math.floor(bytes/1000000000) + " GB";
+    //console.log("bytes out: "+bytes/1000000000 + " GB");
+    return Math.floor((bytes/1000000000)*100)/100 + " GB";
   }
 }
 
