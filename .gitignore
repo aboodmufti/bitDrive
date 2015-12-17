@@ -27,11 +27,11 @@ build/Release
 node_modules
 
 # Sessions folder
-sessions/
+sessions
 
 # database
 mydb.db
 
 # upload folder
-uploads/
+uploads
 
