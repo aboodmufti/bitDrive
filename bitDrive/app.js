@@ -35,10 +35,12 @@ db.serialize(function() {
     db.run("create table if not exists file(\
             file_id integer NOT NULL primary key,\
             dir_id integer,\
+            user_id integer,\
             file_name varchar(100),\
             file_path varchar(200),\
             time varchar(30),\
             size UNSIGNED BIG INT,\
+            foreign key(user_id) references user(user_id) on delete cascade,\
             foreign key(dir_id) references directory(dir_id) on delete cascade)"
             );
     

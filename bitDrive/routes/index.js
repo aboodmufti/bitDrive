@@ -4,6 +4,7 @@ var sqlite3 = require('sqlite3');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var util = require('util');
+var bcrypt = require('bcrypt');
 //var sync = require('sync');
 
 sqlite3.verbose();
@@ -41,11 +42,17 @@ router.post('/login', function(req, res) {
         } 
         else{
             if (result){
-              req.session.userid = result.user_id;
-              req.session.email = email;
-              req.session.Fname = result.first_name;
-              req.session.cookie.maxAge = five_days;
-              res.redirect("/home");
+              if(bcrypt.compareSync(password, result.password)){
+                req.session.userid = result.user_id;
+                req.session.email = email;
+                req.session.Fname = result.first_name;
+                req.session.cookie.maxAge = five_days;
+                res.redirect("/home");
+              }else{
+                var stat = "Username and password don't match";
+                req.session.error = stat;
+                res.redirect("/");
+              }
             }
             else{
               var stat = "Username and password don't match";
@@ -61,7 +68,7 @@ router.post('/login', function(req, res) {
         db.serialize(function() {
             db.get("select *\
                      from user\
-                     where email = ? and password = ? ", email, password, checkName);
+                     where email = ? ", email, checkName);
         });
     }
     else{
@@ -97,7 +104,7 @@ router.get('/home', function(req, res, next) {
       db.serialize(function() {
             db.all("select *\
                      from file\
-                     where dir_id = ? ", rootID, getFiles);
+                     where dir_id = ? and user_id = ?", rootID,req.session.userid, getFiles);
       });
 
     }
@@ -200,7 +207,7 @@ router.get('/home/:id', function(req, res) {
       db.serialize(function() {
             db.all("select *\
                      from file\
-                     where dir_id = ? ", reqDirID, getFiles);
+                     where dir_id = ? and user_id", reqDirID,req.session.userid, getFiles);
       });
 
     }
@@ -274,8 +281,10 @@ router.post('/newAccount', function(req, res, next) {
                 res.render("newAccount.jade", {title: "bitDrive",  msg:stat});
             }
             else{
+                var salt = bcrypt.genSaltSync(10);
+                var hash = bcrypt.hashSync(newPassword, salt);
                 db.serialize(function() {
-                    db.run('insert into user values (NULL,?,?,?,?)',Fname,Lname,email,newPassword, checkUpdate);
+                    db.run('insert into user values (NULL,?,?,?,?)',Fname,Lname,email,hash, checkUpdate);
                 });
             }
         }
@@ -336,7 +345,7 @@ router.post('/uploadFile', upload.single('uploaded') , function(req, res, next) 
       console.log("uploaded file: "+util.inspect(uploaded, false, null))
       if(uploaded){
         db.serialize(function() {
-          db.run('insert into file values (NULL,?,?,?,?,?)',currDirID,uploaded.originalname,uploaded.filename,currTime(), uploaded.size,checkUpload);
+          db.run('insert into file values (NULL,?,?,?,?,?,?)',currDirID,req.session.userid,uploaded.originalname,uploaded.filename,currTime(), uploaded.size,checkUpload);
         });
       }
       else{
@@ -369,7 +378,7 @@ router.post('/createDir', function(req, res, next) {
 
 });
 
-//logout
+//download
 router.post('/download', function(req, res) {
     fileID = req.body.fileID;
     
@@ -393,7 +402,7 @@ router.post('/download', function(req, res) {
       db.serialize(function() {
               db.get("select *\
                        from file\
-                       where file_id = ? ", fileID, getFile);
+                       where file_id = ? and user_id = ?", fileID, req.session.userid,getFile);
       });
     } else {
       res.redirect('/');
@@ -419,7 +428,7 @@ router.post('/renameDir', function(req, res, next) {
 
     if (req.session.userid) {
       db.serialize(function() {
-        db.run('update directory set dir_name = ? where dir_id = ?',newDirName,dirID,checkRename);
+        db.run('update directory set dir_name = ? where dir_id = ? and user_id = ',newDirName, dirID, req.session.userid, checkRename);
       }); 
       //res.redirect('/home/'+currDirID)
     } else {
@@ -445,7 +454,7 @@ router.post('/renameFile', function(req, res, next) {
 
     if (req.session.userid) {
       db.serialize(function() {
-        db.run('update file set file_name = ? where file_id = ?',newfileName,fileID,checkRename);
+        db.run('update file set file_name = ? where file_id = ? and user_id = ?',newfileName, fileID, req.session.userid, checkRename);
       }); 
       //res.redirect('/home/'+currDirID)
     } else {
@@ -470,7 +479,7 @@ router.post('/deleteDir', function(req, res, next) {
 
     if (req.session.userid) {
       db.serialize(function() {
-        db.run('delete from directory where dir_id = ?',dirID,checkDelete);
+        db.run('delete from directory where dir_id = ? and user_id = ?',dirID, req.session.userid, checkDelete);
       }); 
       //res.redirect('/home/'+currDirID)
     } else {
@@ -496,7 +505,7 @@ router.post('/deleteFile', function(req, res, next) {
 
     if (req.session.userid) {
       db.serialize(function() {
-        db.run('delete from file where file_id = ?',fileID,checkDelete);
+        db.run('delete from file where file_id = ? and user_id = ?',fileID,req.session.userid,checkDelete);
       }); 
       //res.redirect('/home/'+currDirID)
     } else {

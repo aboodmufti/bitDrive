@@ -80,9 +80,9 @@
   });
 
 
-  //handle right click on file/directory
+  //handle right click on directory
   $.contextMenu({
-          selector: '.editable', 
+          selector: '.editableDir', 
           callback: function(key, options) {
               if(key == 'edit'){
                 if($(this).attr("type") == 'dir'){
@@ -97,11 +97,47 @@
                   lightBoxDelete("file",$(this).attr("oldName"),'/deleteFile',$(this).attr("name"));
                 }
               }
+              else if(key == 'open'){
+                //open folder
+                window.location.replace("/home/"+$(this).attr("name"));
+              }
           },
           items: {
+              "open": {name: "Open", icon:"add"},
               "edit": {name: "Rename", icon: "edit"},
               "delete": {name: "Delete", icon: "delete"}
           }
+  });
+
+  //handle right click on file
+  $.contextMenu({
+        selector: '.editableFile', 
+        callback: function(key, options) {
+            if(key == 'edit'){
+              if($(this).attr("type") == 'dir'){
+                lightBoxEdit("directory",$(this).attr("oldName"),'/renameDir',$(this).attr("name"));
+              }else if($(this).attr("type") == 'file'){
+                lightBoxEdit("file",$(this).attr("oldName"),'/renamefile',$(this).attr("name"));
+              }
+            }else if(key == 'delete'){
+              if($(this).attr("type") == 'dir'){
+                lightBoxDelete("directory",$(this).attr("oldName"),'/deleteDir',$(this).attr("name"));
+              }else if($(this).attr("type") == 'file'){
+                lightBoxDelete("file",$(this).attr("oldName"),'/deleteFile',$(this).attr("name"));
+              }
+            }
+            else if(key == 'download'){
+              //download file
+              var form = $('<form></form>').attr('action', "/download").attr('method', 'post');
+              form.append($("<input></input>").attr('type', 'hidden').attr('name', "fileID").attr('value', $(this).attr("name")));
+              form.appendTo('body').submit().remove();
+            }
+        },
+        items: {
+            "download": {name: "Download", icon:"add"},
+            "edit": {name: "Rename", icon: "edit"},
+            "delete": {name: "Delete", icon: "delete"}
+        }
   });
 
 
