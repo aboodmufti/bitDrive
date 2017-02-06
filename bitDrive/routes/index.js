@@ -10,6 +10,212 @@ var bcrypt = require('bcrypt');
 sqlite3.verbose();
 var db = new sqlite3.Database('mydb.db');
 db.run("PRAGMA foreign_keys=ON");
+
+router.get('/delivery',function(req,res){
+  res.render("deliv")
+})
+
+router.post('/bestRoute',function(req,res){
+  var array = req.body['arr[]']
+  var request = require('sync-request');
+
+  var url = "https://maps.googleapis.com/maps/api/distancematrix/json?&key=AIzaSyBAEN4S2oWaB4h2olCyyUSgcEH4u8lpcBs"
+
+  var origin = array[0]
+
+  var addresses = array.slice(1)
+
+  var departureMinutes = parseInt(req.body.time)
+
+  function firstDest(){
+    var minTime = 10000000
+    var bestRoute = {}
+    for (var i = 0; i < addresses.length; i++) {
+      var res = request('GET', finalURL(origin,addresses[i]))
+      var json = JSON.parse(res.getBody())
+      var route = {
+        origin: json.origin_addresses[0],
+        destination: json.destination_addresses[0],
+        time: json.rows[0].elements[0].duration.value,
+        index : i
+      }
+      if(route.time < minTime){
+        minTime = route.time
+        bestRoute = route
+      }
+    };
+    return bestRoute
+  }
+
+
+  function findRest(){
+    console.log("findRest")
+    var allRoutes = []
+    var tuples = []
+    for (var i = 0; i < addresses.length; i++) {
+      for (var j = 0; j < addresses.length; j++) {
+        if(j == i ){
+          continue;
+        }
+        if(inTupleArray(tuples,i,j)){
+          continue;
+        }else{
+          tuples.push([i,j])
+
+          var res = request('GET', finalURL(addresses[i],addresses[j]))
+          var json = JSON.parse(res.getBody())
+          var route = {
+            origin: json.origin_addresses[0],
+            destination: json.destination_addresses[0],
+            time: json.rows[0].elements[0].duration.value,
+            indices : [i,j],
+            index1 : i ,
+            index2 : j
+          }
+          allRoutes.push(route)
+        }
+      }
+    }
+    return allRoutes
+  }
+
+  function chooseBestRoute(){
+    console.log("chooseBestRoute")
+    var first = firstDest()
+    var rest = findRest()
+    var nextOrigin = first.index
+    var processedIndices = [nextOrigin]
+
+    while(processedIndices.length < addresses.length){
+      var minTime = 100000000
+      var index = -1
+      for (var i = 0; i < rest.length; i++) {
+        var route = rest[i]
+        if(route.index1 == nextOrigin && processedIndices.indexOf(route.index2) < 0){
+          if(route.time < minTime){
+            minTime = route.time
+            index = route.index2
+          }
+        }else if(route.index2 == nextOrigin && processedIndices.indexOf(route.index1) < 0){
+          if(route.time < minTime){
+            minTime = route.time
+            index = route.index1
+          }
+        }
+      }
+      processedIndices.push(index)
+      nextOrigin = index
+    }
+
+    return processedIndices
+  }
+
+  function finalRoute(){
+    var arrOfDests = chooseBestRoute()
+    var finalTrip = []
+    console.log("finalRoute")
+    //first destination
+
+    var now = Date.now() + (departureMinutes * 60000) //1 hour 
+    var depDate = new Date(now)
+    var bestRes = request('GET', finalUrlDepTime(now,"optimistic",origin,addresses[arrOfDests[0]]))
+    var bestJson = JSON.parse(bestRes.getBody())
+    var bestArivalTime = new Date(now + (bestJson.rows[0].elements[0].duration_in_traffic.value * 1000))
+
+    var worstRes = request('GET', finalUrlDepTime(now,"pessimistic",origin,addresses[arrOfDests[0]]))
+    var worstJson = JSON.parse(worstRes.getBody())
+    var worstArivalTime = new Date(now + (worstJson.rows[0].elements[0].duration_in_traffic.value * 1000))
+    
+    var route = {
+            origin: bestJson.origin_addresses[0],
+            destination: bestJson.destination_addresses[0],
+            worst_departure_time: ""+depDate,
+            best_arrival_time: ""+bestArivalTime,
+            worst_arrival_time: ""+worstArivalTime
+          }
+    finalTrip.push(route)
+
+    for (var i = 0; i < arrOfDests.length - 1; i++) {
+      var newOrigin = addresses[arrOfDests[i]]
+      var newDest = addresses[arrOfDests[i+1]]
+
+      var bestDep = new Date(finalTrip[finalTrip.length - 1].best_arrival_time).getTime() + 60000 // 1 min
+      var bestDepDate = new Date(bestDep)
+      var bestRes = request('GET', finalUrlDepTime(bestDep,"optimistic",newOrigin,newDest))
+      var bestJson = JSON.parse(bestRes.getBody())
+      var bestArivalTime = new Date(bestDep + (bestJson.rows[0].elements[0].duration_in_traffic.value * 1000))
+
+      var worstDep = new Date(finalTrip[finalTrip.length - 1].worst_arrival_time).getTime() + 100000 // 10 mins
+      var worstDepDate = new Date(worstDep)
+      var worstRes = request('GET', finalUrlDepTime(worstDep,"pessimistic",newOrigin,newDest))
+      var worstJson = JSON.parse(worstRes.getBody())
+      var worstArivalTime = new Date(worstDep + (worstJson.rows[0].elements[0].duration_in_traffic.value * 1000))
+      
+      var route = {
+              origin: bestJson.origin_addresses[0],
+              destination: bestJson.destination_addresses[0],
+              best_departure_time: ""+bestDepDate,
+              best_arrival_time: ""+bestArivalTime,
+              worst_departure_time: ""+worstDepDate,
+              worst_arrival_time: ""+worstArivalTime
+          }
+      finalTrip.push(route)
+    };
+
+    return finalTrip
+  }
+
+
+  function start(){
+    var arr = finalRoute()
+    res.json(arr)
+    /*for (var i = 0; i < arr.length; i++) {
+      var route = arr[i]
+      console.log(`---------------------------------------
+    From: ${route.origin}
+    Destination ${i+1}: ${route.destination}
+    Maximum Departure Time: ${route.worst_departure_time}
+    Best Arrival Time: ${route.best_arrival_time}
+    Worst Arrival Time: ${route.worst_arrival_time}`)
+    }
+  */
+  }
+
+  start()
+
+  function finalUrlDepTime(now,model,aOrigin,destination){
+    var finalURL = url+"&origins="+replace(aOrigin)+"&destinations="+replace(destination)+ "&departure_time="+now+"&traffic_model="+model
+    console.log(finalURL)
+    return finalURL
+  }
+
+  function inTupleArray(arr,i,j){
+    for (var k = 0; k < arr.length; k++) {
+      var tuple = arr[k]
+      if(tuple.indexOf(i) > -1 && tuple.indexOf(j) > -1){
+        return true
+      }
+      /*if(tuple == [i,j]){
+        return true
+      }*/
+    }
+    return false
+  }
+
+  function finalURL(aOrigin,destination){
+    var finalURL = url+"&origins="+replace(aOrigin)+"&destinations="+replace(destination)
+    return finalURL
+  }
+
+  function replace(str){
+    return str.replace(" ","+")
+  }
+  
+})
+
+
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     

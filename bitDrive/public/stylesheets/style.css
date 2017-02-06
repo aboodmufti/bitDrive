@@ -15,10 +15,34 @@ a {
 }
 
 
+@font-face {
+    font-family: "Raleway-bold";
+    src: url(../other/raleway/Raleway-SemiBold.ttf);
+}
 /*HEADERS*/
+ 
+b{
+  font-family: "Raleway-bold"
+}
  
 
 /*FIELDS*/
+input{
+  width: 200px;
+  height: 30px;
+  margin: 15px;
+  font-size: 20px;
+  padding-left: 5px; 
+  font-family: "Raleway";
+  border:0px solid black;
+  border-bottom: 1px solid #b3b3b3;
+}
+
+input:focus{
+  outline: 0px ;
+  border-bottom: 1px solid #3399ff;
+}
+
 input.bigInput{
   width: 200px;
   height: 30px;
@@ -32,6 +56,22 @@ input.bigInput{
 input.bigInput:focus{
   outline: 0px ;
   border-bottom: 1px solid #3399ff;
+}
+
+
+table#destinationTable{
+  width: 100%;
+}
+
+td.small{
+  width:150px;
+}
+
+td.big{
+  width:auto;
+}
+input.big{
+  width : 50%;
 }
 
 /*IMAGES*/
@@ -124,6 +164,15 @@ button{
 
 button:focus{
   outline:0px;
+}
+
+
+button.small{
+  width: auto;
+  height: auto;
+  padding: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 button.blue {

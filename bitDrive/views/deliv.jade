@@ -1,0 +1,31 @@
+extends layoutSecond
+block header
+  script(src='/javascripts/jquery-1.11.3.min.js')
+  script(src='/javascripts/deliv.js')
+  script( type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCK1MoCfFCY0SFt5K4Vb4Hc2ETYv1yEJgU&libraries=places&callback=initAutocomplete" async defer)
+
+
+block content
+  h2 Smart Delivery
+  div#results 
+    
+  div
+    table#destinationTable
+        tr
+          td.small Leave:
+          td.big
+            input#time(type="text"  placeholder="30") 
+            |minutes from now
+        tr
+          td.small Origin address:
+          td.big
+            input#autocomplete(type="text" class="big")
+        tr
+          td.small Next Destination:
+          td.big 
+            input#autocomplete2(type="text" class="big")
+    br
+    button#addAddr(type="button" ,class="small blue") +
+    br
+    button#submit(type="button" ,class="green") Get Best Route
+  

@@ -14,10 +14,11 @@
     "jade": "~1.11.0",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
-    "sqlite3":"^3.1.1",
+    "sqlite3":"^3.1.8",
     "session-file-store" : "^0.0.22",
     "multer": "1.1.0",
     "sync": "0.2.5",
-    "bcrypt": "^0.8.5"
+    "bcrypt": "^1.0.2",
+    "sync-request": "latest"
   }
 }
